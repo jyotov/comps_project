@@ -1,27 +1,27 @@
-import dash
 from dash import dcc, html, dash_table, callback
 from dash.dependencies import Input, Output, State
 import pandas as pd
 
 # Initial DataFrame with empty code and output columns
 initial_data = {
-    'Code': ["", "", "", ""],
-    'Output': ["", "", "", ""]
+    'Code': ["", "", "", "", "", ""],
+    'Output': ["", "", "", "", "", ""]
 }
 df = pd.DataFrame(initial_data)
 
 # dash.register_page(__name__)
 
 layout = [
-    html.H1(children='add'),
+    html.H1(children='middle_values'),
     html.Div(children=dcc.Markdown('''
-            Return the sum of two integers, `a` and `b`.
+            Given two arguments, both lists of integers (`a` and `b`), each of odd length, return a new list of length two
+            containing their middle elements.
             '''),
              style={'textAlign': 'left',
                     }),
     dcc.Textarea(
         id='textarea-example',
-        value='def add(a, b):',
+        value='def middle_values(a, b):',
         style={'width': '100%', 'height': 300},  # this is CSS -- you can change the styles
     ),
     # html.Button('Submit', id='submit-val', n_clicks=0),
@@ -31,7 +31,7 @@ layout = [
     # ),
     html.Div([
         dash_table.DataTable(
-            id='result3',
+            id='result9',
             columns=[
                 {"name": "Code", "id": "Code", "editable": True},
                 {"name": "Output", "id": "Output"},
@@ -63,9 +63,9 @@ layout = [
 
 # for submit button -> for data table
 @callback(
-    Output('result3', 'data'),
+    Output('result9', 'data'),
     Input('run-button', 'n_clicks'),
-    State('result3', 'data'),
+    State('result9', 'data'),
     State('textarea-example', 'value'),
     config_prevent_initial_callbacks=True
 )
@@ -80,23 +80,19 @@ def execute_code(n_clicks, rows, value):
             try:
                 # Limit scope to only evaluate simple expressions
                 local_scope = {}
-                exec("result3 = " + code, globals, locals)  # safer for simple expressions
-                row['Output'] = locals.get('result3', '')
-                locals2 = {"add":add}
-                exec("result3 = " + code, globals, locals2)  # safer for simple expressions
-                row['Expected'] = locals2.get('result3', '')
+                exec("result9 = " + code, globals, locals)  # safer for simple expressions
+                row['Output'] = locals.get('result9', '')
+                locals2 = {"middle_values":middle_values}
+                exec("result9 = " + code, globals, locals2)  # safer for simple expressions
+                row['Expected'] = locals2.get('result9', '')
                 # if row['Expected'] == row['Output']:
                 #     cases_passed += 1
             except Exception as e:
                 row['Output'] = f"Error: {str(e)}"
     return rows
 
-def add(a, b):
-    return a + b
+def middle_values(a, b):
+    middle_a = a[len(a) // 2]
+    middle_b = b[len(b) // 2]
+    return [middle_a, middle_b]
 
-# def update_graph(_: int, code: str) -> str:
-#     globals = {}
-#     locals = {}
-#     exec(code, globals, locals)
-#     return str(locals.get("result"))
-#     # return str((globals,locals))

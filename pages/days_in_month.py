@@ -1,27 +1,28 @@
-import dash
 from dash import dcc, html, dash_table, callback
 from dash.dependencies import Input, Output, State
 import pandas as pd
 
 # Initial DataFrame with empty code and output columns
 initial_data = {
-    'Code': ["", "", "", ""],
-    'Output': ["", "", "", ""]
+    'Code': ["", "", "", "", "", ""],
+    'Output': ["", "", "", "", "", ""]
 }
 df = pd.DataFrame(initial_data)
 
 # dash.register_page(__name__)
 
 layout = [
-    html.H1(children='add'),
+    html.H1(children='days_in_month'),
     html.Div(children=dcc.Markdown('''
-            Return the sum of two integers, `a` and `b`.
+            Return the number of days in a given month. The argument `month` is a string of a month (such as `March`).
+            For February, `leap_year` will tell you whether it is a leap year, in which case February has 29 days. Otherwise,
+            it has 28 days. Return `Invalid month` if the argument `month` is not properly formatted.
             '''),
              style={'textAlign': 'left',
                     }),
     dcc.Textarea(
         id='textarea-example',
-        value='def add(a, b):',
+        value='def days_in_month(month, leap_year):',
         style={'width': '100%', 'height': 300},  # this is CSS -- you can change the styles
     ),
     # html.Button('Submit', id='submit-val', n_clicks=0),
@@ -31,7 +32,7 @@ layout = [
     # ),
     html.Div([
         dash_table.DataTable(
-            id='result3',
+            id='result4',
             columns=[
                 {"name": "Code", "id": "Code", "editable": True},
                 {"name": "Output", "id": "Output"},
@@ -63,9 +64,9 @@ layout = [
 
 # for submit button -> for data table
 @callback(
-    Output('result3', 'data'),
+    Output('result4', 'data'),
     Input('run-button', 'n_clicks'),
-    State('result3', 'data'),
+    State('result4', 'data'),
     State('textarea-example', 'value'),
     config_prevent_initial_callbacks=True
 )
@@ -80,23 +81,41 @@ def execute_code(n_clicks, rows, value):
             try:
                 # Limit scope to only evaluate simple expressions
                 local_scope = {}
-                exec("result3 = " + code, globals, locals)  # safer for simple expressions
-                row['Output'] = locals.get('result3', '')
-                locals2 = {"add":add}
-                exec("result3 = " + code, globals, locals2)  # safer for simple expressions
-                row['Expected'] = locals2.get('result3', '')
+                exec("result4 = " + code, globals, locals)  # safer for simple expressions
+                row['Output'] = locals.get('result4', '')
+                locals2 = {"days_in_month":days_in_month}
+                exec("result4 = " + code, globals, locals2)  # safer for simple expressions
+                row['Expected'] = locals2.get('result4', '')
                 # if row['Expected'] == row['Output']:
                 #     cases_passed += 1
             except Exception as e:
                 row['Output'] = f"Error: {str(e)}"
     return rows
 
-def add(a, b):
-    return a + b
-
-# def update_graph(_: int, code: str) -> str:
-#     globals = {}
-#     locals = {}
-#     exec(code, globals, locals)
-#     return str(locals.get("result"))
-#     # return str((globals,locals))
+def days_in_month(month, leap_year):
+    if month == "January":
+        return 31
+    elif month == "February":
+        return 29 if leap_year else 28
+    elif month == "March":
+        return 31
+    elif month == "April":
+        return 30
+    elif month == "May":
+        return 31
+    elif month == "June":
+        return 30
+    elif month == "July":
+        return 31
+    elif month == "August":
+        return 31
+    elif month == "September":
+        return 30
+    elif month == "October":
+        return 31
+    elif month == "November":
+        return 30
+    elif month == "December":
+        return 31
+    else:
+        return "Invalid month"

@@ -1,27 +1,27 @@
-import dash
 from dash import dcc, html, dash_table, callback
 from dash.dependencies import Input, Output, State
 import pandas as pd
 
 # Initial DataFrame with empty code and output columns
 initial_data = {
-    'Code': ["", "", "", ""],
-    'Output': ["", "", "", ""]
+    'Code': ["", "", "", "", "", ""],
+    'Output': ["", "", "", "", "", ""]
 }
 df = pd.DataFrame(initial_data)
 
 # dash.register_page(__name__)
 
 layout = [
-    html.H1(children='add'),
+    html.H1(children='equal_first_last'),
     html.Div(children=dcc.Markdown('''
-            Return the sum of two integers, `a` and `b`.
+            Given two arguments, a list of integers `lst` and an integer `num`, return `True` if the first element and the last element 
+            are both equal to `num` and `False` otherwise. Return `False` if `lst` is empty.
             '''),
              style={'textAlign': 'left',
                     }),
     dcc.Textarea(
         id='textarea-example',
-        value='def add(a, b):',
+        value='def equal_first_last(lst, num):',
         style={'width': '100%', 'height': 300},  # this is CSS -- you can change the styles
     ),
     # html.Button('Submit', id='submit-val', n_clicks=0),
@@ -31,7 +31,7 @@ layout = [
     # ),
     html.Div([
         dash_table.DataTable(
-            id='result3',
+            id='result8',
             columns=[
                 {"name": "Code", "id": "Code", "editable": True},
                 {"name": "Output", "id": "Output"},
@@ -63,9 +63,9 @@ layout = [
 
 # for submit button -> for data table
 @callback(
-    Output('result3', 'data'),
+    Output('result8', 'data'),
     Input('run-button', 'n_clicks'),
-    State('result3', 'data'),
+    State('result8', 'data'),
     State('textarea-example', 'value'),
     config_prevent_initial_callbacks=True
 )
@@ -80,23 +80,18 @@ def execute_code(n_clicks, rows, value):
             try:
                 # Limit scope to only evaluate simple expressions
                 local_scope = {}
-                exec("result3 = " + code, globals, locals)  # safer for simple expressions
-                row['Output'] = locals.get('result3', '')
-                locals2 = {"add":add}
-                exec("result3 = " + code, globals, locals2)  # safer for simple expressions
-                row['Expected'] = locals2.get('result3', '')
+                exec("result8 = " + code, globals, locals)  # safer for simple expressions
+                row['Output'] = locals.get('result8', '')
+                locals2 = {"equal_first_last":equal_first_last}
+                exec("result8 = " + code, globals, locals2)  # safer for simple expressions
+                row['Expected'] = locals2.get('result8', '')
                 # if row['Expected'] == row['Output']:
                 #     cases_passed += 1
             except Exception as e:
                 row['Output'] = f"Error: {str(e)}"
     return rows
 
-def add(a, b):
-    return a + b
-
-# def update_graph(_: int, code: str) -> str:
-#     globals = {}
-#     locals = {}
-#     exec(code, globals, locals)
-#     return str(locals.get("result"))
-#     # return str((globals,locals))
+def equal_first_last(lst, num):
+    if len(lst) == 0:
+        return False
+    return lst[0] == num and lst[-1] == num

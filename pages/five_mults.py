@@ -1,27 +1,26 @@
-import dash
 from dash import dcc, html, dash_table, callback
 from dash.dependencies import Input, Output, State
 import pandas as pd
 
 # Initial DataFrame with empty code and output columns
 initial_data = {
-    'Code': ["", "", "", ""],
-    'Output': ["", "", "", ""]
+    'Code': ["", "", "", "", "", ""],
+    'Output': ["", "", "", "", "", ""]
 }
 df = pd.DataFrame(initial_data)
 
 # dash.register_page(__name__)
 
 layout = [
-    html.H1(children='add'),
+    html.H1(children='five_mults'),
     html.Div(children=dcc.Markdown('''
-            Return the sum of two integers, `a` and `b`.
+            Define a function `five_mults` that returns a list of the first five multiples of an integer `num` using a while loop.
             '''),
              style={'textAlign': 'left',
                     }),
     dcc.Textarea(
         id='textarea-example',
-        value='def add(a, b):',
+        value='def five_mults(num):',
         style={'width': '100%', 'height': 300},  # this is CSS -- you can change the styles
     ),
     # html.Button('Submit', id='submit-val', n_clicks=0),
@@ -31,7 +30,7 @@ layout = [
     # ),
     html.Div([
         dash_table.DataTable(
-            id='result3',
+            id='result13',
             columns=[
                 {"name": "Code", "id": "Code", "editable": True},
                 {"name": "Output", "id": "Output"},
@@ -63,9 +62,9 @@ layout = [
 
 # for submit button -> for data table
 @callback(
-    Output('result3', 'data'),
+    Output('result13', 'data'),
     Input('run-button', 'n_clicks'),
-    State('result3', 'data'),
+    State('result13', 'data'),
     State('textarea-example', 'value'),
     config_prevent_initial_callbacks=True
 )
@@ -80,23 +79,21 @@ def execute_code(n_clicks, rows, value):
             try:
                 # Limit scope to only evaluate simple expressions
                 local_scope = {}
-                exec("result3 = " + code, globals, locals)  # safer for simple expressions
-                row['Output'] = locals.get('result3', '')
-                locals2 = {"add":add}
-                exec("result3 = " + code, globals, locals2)  # safer for simple expressions
-                row['Expected'] = locals2.get('result3', '')
+                exec("result13 = " + code, globals, locals)  # safer for simple expressions
+                row['Output'] = locals.get('result13', '')
+                locals2 = {"five_mults":five_mults}
+                exec("result13 = " + code, globals, locals2)  # safer for simple expressions
+                row['Expected'] = locals2.get('result13', '')
                 # if row['Expected'] == row['Output']:
                 #     cases_passed += 1
             except Exception as e:
                 row['Output'] = f"Error: {str(e)}"
     return rows
 
-def add(a, b):
-    return a + b
-
-# def update_graph(_: int, code: str) -> str:
-#     globals = {}
-#     locals = {}
-#     exec(code, globals, locals)
-#     return str(locals.get("result"))
-#     # return str((globals,locals))
+def five_mults(num):
+    multiples = []
+    i = 1
+    while len(multiples) < 5:
+        multiples.append(num * i)
+        i += 1
+    return multiples
